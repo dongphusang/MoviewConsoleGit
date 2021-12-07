@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MoviewConsole.Importer;
 
 namespace MoviewConsole
 {
@@ -8,7 +9,11 @@ namespace MoviewConsole
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            ReportImporter importer = new ReportImporter();
+            importer.RetrieveFile(1);
+
+            Console.WriteLine(importer.ToString());
+            Console.Read();
         }
     }
 }

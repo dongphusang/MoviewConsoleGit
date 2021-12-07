@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sangs\\Desktop\\FinalProject\\MoviewConsole\\MoviewConsole.csproj": {}
+    "C:\\Users\\sangs\\Desktop\\MoviewConsoleGit\\FinalProject\\MoviewConsole\\MoviewConsole.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sangs\\Desktop\\FinalProject\\MoviewConsole\\MoviewConsole.csproj": {
+    "C:\\Users\\sangs\\Desktop\\MoviewConsoleGit\\FinalProject\\MoviewConsole\\MoviewConsole.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sangs\\Desktop\\FinalProject\\MoviewConsole\\MoviewConsole.csproj",
+        "projectUniqueName": "C:\\Users\\sangs\\Desktop\\MoviewConsoleGit\\FinalProject\\MoviewConsole\\MoviewConsole.csproj",
         "projectName": "MoviewConsole",
-        "projectPath": "C:\\Users\\sangs\\Desktop\\FinalProject\\MoviewConsole\\MoviewConsole.csproj",
+        "projectPath": "C:\\Users\\sangs\\Desktop\\MoviewConsoleGit\\FinalProject\\MoviewConsole\\MoviewConsole.csproj",
         "packagesPath": "C:\\Users\\sangs\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sangs\\Desktop\\FinalProject\\MoviewConsole\\obj\\",
+        "outputPath": "C:\\Users\\sangs\\Desktop\\MoviewConsoleGit\\FinalProject\\MoviewConsole\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -43,6 +43,12 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
+          "dependencies": {
+            "Azure.Storage.Blobs": {
+              "target": "Package",
+              "version": "[12.10.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
