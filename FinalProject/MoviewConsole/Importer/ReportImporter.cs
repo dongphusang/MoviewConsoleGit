@@ -61,24 +61,38 @@ namespace MoviewConsole.Importer
                     if (sector <= 7 && sector > 0) // if blob not exist and currently not sector 0
                     {
                         Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob of previous sector retrieved"); // debug
-                        sector --;
-                        BlobName = $"{sector}.txt";
-                        fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
-                        BlobClient = BlobContainerClient.GetBlobClient(BlobName);
+
+                        ModifyTargetBlob(sector, out fileName);
                         await BlobClient.DownloadToAsync(fileName);
                     }
                     else
                     {
                         Console.WriteLine("lmao your data isn't here yet bruh :)"); // debug
-                        BlobName = $"{sector}null.txt";
-                        fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
-                        BlobClient = BlobContainerClient.GetBlobClient(BlobName);
+
+                        ModifyTargetBlob(sector, out fileName);
                         await BlobClient.DownloadToAsync(fileName);
                     }                     
                 }
             } catch (RequestFailedException e)
             {
                 Console.WriteLine($"HTTP request failed: {e.Message} {e.ErrorCode}");
+            }
+        }
+
+        private void ModifyTargetBlob(int sector, out string fileName)
+        {
+            if (sector <= 7 && sector >= 0)
+            {
+                sector--;
+                BlobName = $"{sector}.txt";
+                fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
+                BlobClient = BlobContainerClient.GetBlobClient(BlobName);
+            }
+            else
+            {
+                BlobName = $"{sector}null.txt";
+                fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
+                BlobClient = BlobContainerClient.GetBlobClient(BlobName);
             }
         }
     }
