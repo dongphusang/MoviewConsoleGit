@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Azure;
 using Azure.Storage.Blobs;
 using MoviewConsole.Interface;
@@ -26,24 +27,16 @@ namespace MoviewConsole.Importer
             ContainerName = "Not specified";
         }
 
-
-
-        /// <summary>
-        /// Extract content from the file
-        /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
-        public void ExtractRawContent()
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Retrieves blob from the cloud from given day sector
+        /// Go back one sector if blob of that particular time frame isn't in the cloud
+        /// </summary>
+        /// <debug>
         /// Debug> Three cases to be tested !>
         /// Debug> First case: Blob Exists and Downloaded to destination
         /// Debug> Second case: Blob doesn't exist, decrease sector by 1
         /// Debug> Third case: Blob doesn't exist, sector = 0, null.txt will be downloaded
-        /// </summary>
+        /// </debug>
         /// <param name="sector"> represents a specific time frame in a day. Ex: sector 0 = 0:00 to 2:59 in the morning</param>
         public async void RetrieveFile(int sector)
         {
@@ -53,28 +46,33 @@ namespace MoviewConsole.Importer
         private async Task DownloadBlob(int sector)
         {
             BlobName = $"{sector}.txt";
+            var fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
             try
             {
                 BlobClient = BlobContainerClient.GetBlobClient(BlobName); 
                 if (await BlobClient.ExistsAsync())
                 {
-                    Console.WriteLine("Blob Exists and Downloaded"); // debug
-                    await BlobClient.DownloadToAsync($"C:\\Users\\sangs\\Desktop\\{BlobName}");
+                    //Console.WriteLine("Blob Exists and Downloaded"); // debug
+                    await BlobClient.DownloadToAsync(fileName);
                 }
                 else
                 {
-                    if (sector != 0)
+                    if (sector <= 7 && sector > 0) // if blob not exist and currently not sector 0
                     {
-                        Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob retrieved"); // debug
-                        sector = sector - 1;
+                        Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob of previous sector retrieved"); // debug
+                        sector --;
                         BlobName = $"{sector}.txt";
-                        await BlobClient.DownloadToAsync($"C:\\Users\\sangs\\Desktop\\{BlobName}");
+                        fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
+                        BlobClient = BlobContainerClient.GetBlobClient(BlobName);
+                        await BlobClient.DownloadToAsync(fileName);
                     }
                     else
                     {
-                        Console.WriteLine("lmao your data isn't here yet bruh :)"); // debug
+                        //Console.WriteLine("lmao your data isn't here yet bruh :)"); // debug
                         BlobName = "null.txt";
-                        await BlobClient.DownloadToAsync($"C:\\Users\\sangs\\Desktop\\{BlobName}");
+                        fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
+                        BlobClient = BlobContainerClient.GetBlobClient(BlobName);
+                        await BlobClient.DownloadToAsync(fileName);
                     }                     
                 }
             } catch (RequestFailedException e)

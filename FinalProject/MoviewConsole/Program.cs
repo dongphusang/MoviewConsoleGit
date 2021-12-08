@@ -10,7 +10,7 @@ namespace MoviewConsole
         public static void Main(string[] args)
         {
             ReportImporter importer = new ReportImporter();
-            importer.RetrieveFile(1);
+            importer.RetrieveFile(6);
 
             Console.WriteLine(importer.ToString());
             Console.Read();
