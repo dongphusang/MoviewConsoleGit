@@ -17,6 +17,7 @@ namespace MoviewConsole.Importer
         public BlobClient BlobClient { get; private set; }
         public string BlobName { get; private set; }
         public string ContainerName { get; private set; }
+        public bool BlobExist { get; private set; }
 
         public ReportImporter ()
         {
@@ -41,6 +42,7 @@ namespace MoviewConsole.Importer
         public async void RetrieveFile(int sector)
         {
             await DownloadBlob(sector);
+
         }
 
         private async Task DownloadBlob(int sector)
@@ -52,7 +54,8 @@ namespace MoviewConsole.Importer
                 BlobClient = BlobContainerClient.GetBlobClient(BlobName); 
                 if (await BlobClient.ExistsAsync())
                 {
-                    //Console.WriteLine("Blob Exists and Downloaded"); // debug
+                    Console.WriteLine("Blob Exists and Downloaded"); // debug
+                    BlobExist = true;
                     await BlobClient.DownloadToAsync(fileName);
                 }
                 else
@@ -64,14 +67,16 @@ namespace MoviewConsole.Importer
                         BlobName = $"{sector}.txt";
                         fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
                         BlobClient = BlobContainerClient.GetBlobClient(BlobName);
+                        BlobExist = false;
                         await BlobClient.DownloadToAsync(fileName);
                     }
                     else
                     {
-                        //Console.WriteLine("lmao your data isn't here yet bruh :)"); // debug
-                        BlobName = "null.txt";
+                        Console.WriteLine("lmao your data isn't here yet bruh :)"); // debug
+                        BlobName = $"{sector}null.txt";
                         fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
                         BlobClient = BlobContainerClient.GetBlobClient(BlobName);
+                        BlobExist = false;
                         await BlobClient.DownloadToAsync(fileName);
                     }                     
                 }

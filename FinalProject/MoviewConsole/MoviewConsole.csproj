@@ -8,11 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
+    <Compile Remove="DownloadedBlob\**" />
+    <EmbeddedResource Remove="DownloadedBlob\**" />
+    <None Remove="DownloadedBlob\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DownloadedBlob\" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
   </ItemGroup>
 
 </Project>

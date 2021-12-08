@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MoviewConsole.Manager;
 using MoviewConsole.Importer;
 
 namespace MoviewConsole
@@ -9,10 +10,10 @@ namespace MoviewConsole
     {
         public static void Main(string[] args)
         {
-            ReportImporter importer = new ReportImporter();
-            importer.RetrieveFile(6);
+            ReportManager reportManager = new ReportManager();
+            reportManager.ExtractContent();
 
-            Console.WriteLine(importer.ToString());
+
             Console.Read();
         }
     }
