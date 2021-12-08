@@ -12,7 +12,7 @@ namespace MoviewConsole.Manager
         private readonly ReportImporter importer;
         public int Sector { get; private set; } // represents specific time frame in a day
         public string RawContent { get; private set; } // content extracted from blob
-        private DateTime date { get; set; } // manipulated to get sector 
+        private DateTime date; // manipulated to get sector 
         private string fileName;
         private string filePath;
         
@@ -28,13 +28,13 @@ namespace MoviewConsole.Manager
         /// <summary>
         /// Gets the saved blob and extracts raw content
         /// </summary>
-        public void ExtractContent()
+        public async void ExtractContent()
         {
             date = DateTime.Now;
             Sector = DetermineSector();
 
-            importer.RetrieveFile(Sector); // temporary. this line's existence serves only for debugging
-
+            await importer.RetrieveFile(Sector); // temporary. this line's existence serves only for debugging
+            Console.WriteLine(Sector);
             fileName = DetermineFileName();
             filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName); // path to %appdata%
 
@@ -44,7 +44,8 @@ namespace MoviewConsole.Manager
 
         private string DetermineFileName()
         {
-            if (importer.BlobExist)
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), $"{Sector}.txt");
+            if (File.Exists(path))
             {
                 return $"{Sector}.txt";
             }

@@ -17,7 +17,6 @@ namespace MoviewConsole.Importer
         public BlobClient BlobClient { get; private set; }
         public string BlobName { get; private set; }
         public string ContainerName { get; private set; }
-        public bool BlobExist { get; private set; }
 
         public ReportImporter ()
         {
@@ -39,7 +38,7 @@ namespace MoviewConsole.Importer
         /// Debug> Third case: Blob doesn't exist, sector = 0, null.txt will be downloaded
         /// </debug>
         /// <param name="sector"> represents a specific time frame in a day. Ex: sector 0 = 0:00 to 2:59 in the morning</param>
-        public async void RetrieveFile(int sector)
+        public async Task RetrieveFile(int sector)
         {
             await DownloadBlob(sector);
 
@@ -55,7 +54,6 @@ namespace MoviewConsole.Importer
                 if (await BlobClient.ExistsAsync())
                 {
                     Console.WriteLine("Blob Exists and Downloaded"); // debug
-                    BlobExist = true;
                     await BlobClient.DownloadToAsync(fileName);
                 }
                 else
@@ -67,7 +65,6 @@ namespace MoviewConsole.Importer
                         BlobName = $"{sector}.txt";
                         fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
                         BlobClient = BlobContainerClient.GetBlobClient(BlobName);
-                        BlobExist = false;
                         await BlobClient.DownloadToAsync(fileName);
                     }
                     else
@@ -76,7 +73,6 @@ namespace MoviewConsole.Importer
                         BlobName = $"{sector}null.txt";
                         fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
                         BlobClient = BlobContainerClient.GetBlobClient(BlobName);
-                        BlobExist = false;
                         await BlobClient.DownloadToAsync(fileName);
                     }                     
                 }
