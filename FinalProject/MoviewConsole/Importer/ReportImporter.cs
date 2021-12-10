@@ -52,25 +52,14 @@ namespace MoviewConsole.Importer
                 }
                 else
                 {
-                    if (sector <= 7 && sector > 0) // if blob not exist and currently not sector 0
-                    {
-                        Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob of previous sector retrieved"); // debug
                         while(!BlobClient.Exists())
                         {
+                            Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob of previous sector retrieved"); // debug
                             ModifyTargetBlob(sector, out fileName);
                             Console.WriteLine("ReportImporter.RetrieveFile().fileName(60): " + fileName);
                         }
 
-                        await BlobClient.DownloadToAsync(fileName);
-                    }
-                    else
-                    {
-                        Console.WriteLine("lmao your data isn't here yet bruh :)"); // debug
-
-                        ModifyTargetBlob(sector, out fileName);
-                        Console.WriteLine("ReportImporter.RetrieveFile().fileName(68): " + fileName);
-                        await BlobClient.DownloadToAsync(fileName);
-                    }
+                       await BlobClient.DownloadToAsync(fileName);      
                 }
             }
             catch (RequestFailedException e)

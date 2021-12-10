@@ -12,7 +12,8 @@ namespace MoviewConsole
         {
             ReportManager reportManager = new ReportManager();
             reportManager.ExtractContent();
-            //reportManager.RetrieveProcessedData();
+            reportManager.RetrieveProcessedData();
+            reportManager.PrintReport();
 
             Console.Read();
         }

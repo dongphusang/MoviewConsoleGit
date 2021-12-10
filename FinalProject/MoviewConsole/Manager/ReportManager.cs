@@ -10,7 +10,7 @@ namespace MoviewConsole.Manager
 {
     class ReportManager
     {
-        public int Sector { get; private set; } // represents specific time frame in a day
+        public int Sector { get; private set; }
         public string RawContent { get; private set; } // content extracted from blob
 
         private List<string> processedImport;
@@ -41,28 +41,12 @@ namespace MoviewConsole.Manager
 
             await importer.RetrieveFile(Sector); // temporary. this line's existence serves only for debugging
             Console.WriteLine(Sector);
-            fileName = DetermineFileName();
+            fileName = importer.BlobName;
             Console.WriteLine(fileName);
             filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName); // path to %appdata%
 
             RawContent = File.ReadAllText(filePath);
-            //Console.WriteLine("ReportManager.ExtractContent().RawContent: "+RawContent);
-        }
-
-        /// <summary>
-        /// -Sub Method-
-        /// If there is the target blob downloaded to the folder, its name will not include the word null in it
-        /// </summary>
-        /// <returns>string indication of whether raw data retrieved or not retrieved</returns>
-        private string DetermineFileName()
-        {
-            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), $"{Sector}.txt");
-            if (File.Exists(path))
-            {
-                return $"{Sector}.txt";
-            }
-            else
-                return $"{Sector}null.txt";
+            Console.WriteLine("ReportManager.ExtractContent().RawContent: "+RawContent);
         }
 
         /// <summary>
@@ -108,7 +92,14 @@ namespace MoviewConsole.Manager
 
         public void RetrieveProcessedData()
         {
+            decoder.RegisterImport(RawContent);
             decoder.ProcessImport(out processedImport);
+        }
+
+        // for debugging
+        public void PrintReport()
+        {
+            Console.WriteLine("Number of elements: "+processedImport.Count());
         }
 
     }
