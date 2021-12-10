@@ -55,9 +55,12 @@ namespace MoviewConsole.Importer
                     if (sector <= 7 && sector > 0) // if blob not exist and currently not sector 0
                     {
                         Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob of previous sector retrieved"); // debug
+                        while(!BlobClient.Exists())
+                        {
+                            ModifyTargetBlob(sector, out fileName);
+                            Console.WriteLine("ReportImporter.RetrieveFile().fileName(60): " + fileName);
+                        }
 
-                        ModifyTargetBlob(sector, out fileName);
-                        Console.WriteLine("ReportImporter.RetrieveFile().fileName(60): " + fileName);
                         await BlobClient.DownloadToAsync(fileName);
                     }
                     else
