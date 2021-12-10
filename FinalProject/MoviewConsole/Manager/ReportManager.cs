@@ -4,18 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MoviewConsole.Importer;
-using MoviewConsole.Decoder;
 
 namespace MoviewConsole.Manager
 {
     class ReportManager
     {
-        public int Sector { get; private set; }
-        public string RawContent { get; private set; } // content extracted from blob
+        public int Sector { get; private set; } // represents a specific time frame in a day. Each time frame is 3 hours in length. Starting from 0:00 to 2:59 is sector 0 for example
+        private string rawImport; // content extracted from blob
 
         private List<string> processedImport;
         private readonly ReportImporter importer;
-        private readonly ReportDecoder decoder;
         private DateTime date; // manipulated to get sector 
         private string fileName;
         private string filePath;
@@ -24,29 +22,39 @@ namespace MoviewConsole.Manager
         public ReportManager()
         {
             importer = new();
-            decoder = new();
             processedImport = new List<string>();
             fileName = "not specified";
             filePath = "not specified";
-            RawContent = "non retrieved";
+            rawImport = "non retrieved";
         }
 
         /// <summary>
         /// Gets the saved blob and extracts raw content
         /// </summary>
-        public async void ExtractContent()
+        /// <DEBUGGING NOTE>
+        /// Can't separate line 51-55 from the method as processedImport might get incorrect/unexpected results. 
+        /// This could potentially because of the block running ahead of time before file is retrieved in ReportImporter
+        /// </DEBUGGING>
+        public async void ProcessData()
         {
             date = DateTime.Now;
             Sector = DetermineSector();
 
             await importer.RetrieveFile(Sector); // temporary. this line's existence serves only for debugging
-            Console.WriteLine(Sector);
+            Console.WriteLine(Sector); // debugging
             fileName = importer.BlobName;
-            Console.WriteLine(fileName);
+            Console.WriteLine(fileName); // debugging
             filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName); // path to %appdata%
 
-            RawContent = File.ReadAllText(filePath);
-            Console.WriteLine("ReportManager.ExtractContent().RawContent: "+RawContent);
+            rawImport = File.ReadAllText(filePath);
+            Console.WriteLine("ReportManager.ExtractContent().RawContent: "+rawImport); // debugging
+
+            var tokens = rawImport.Split(",");
+            foreach (var token in tokens)
+            {
+                Console.WriteLine("ReportManager.ProcessImport(): " + token); // debugging
+                processedImport.Add(token);
+            }
         }
 
         /// <summary>
@@ -90,17 +98,6 @@ namespace MoviewConsole.Manager
             }
         }
 
-        public void RetrieveProcessedData()
-        {
-            decoder.RegisterImport(RawContent);
-            decoder.ProcessImport(out processedImport);
-        }
-
-        // for debugging
-        public void PrintReport()
-        {
-            Console.WriteLine("Number of elements: "+processedImport.Count());
-        }
 
     }
 }

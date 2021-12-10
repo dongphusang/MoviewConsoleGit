@@ -11,9 +11,7 @@ namespace MoviewConsole
         public static void Main(string[] args)
         {
             ReportManager reportManager = new ReportManager();
-            reportManager.ExtractContent();
-            reportManager.RetrieveProcessedData();
-            reportManager.PrintReport();
+            reportManager.ProcessData();
 
             Console.Read();
         }

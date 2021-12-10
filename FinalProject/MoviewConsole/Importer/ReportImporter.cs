@@ -28,16 +28,11 @@ namespace MoviewConsole.Importer
         }
 
         /// <summary>
-        /// Retrieves blob from the cloud from given day sector
-        /// Go back one sector if blob of that particular time frame isn't in the cloud
+        /// Retrieves blob from the cloud from given day sector.
+        /// Goes back one sector if blob of that particular time frame isn't in the cloud. Goes back
+        /// until there is an available blob in the cloud, however, retrieves a "{sector}null.txt" if there are none
         /// </summary>
-        /// <debug>
-        /// Debug> Three cases to be tested !>
-        /// Debug> First case: Blob Exists and Downloaded to destination
-        /// Debug> Second case: Blob doesn't exist, decrease sector by 1
-        /// Debug> Third case: Blob doesn't exist, sector = 0, null.txt will be downloaded
-        /// </debug>
-        /// <param name="sector"> represents a specific time frame in a day. Ex: sector 0 = 0:00 to 2:59 in the morning</param>
+        /// <param name="sector">represents a specific time frame in a day</param>
         public async Task RetrieveFile(int sector)
         {
             BlobName = $"{sector}.txt";
@@ -66,9 +61,13 @@ namespace MoviewConsole.Importer
             {
                 Console.WriteLine($"HTTP request failed: {e.Message} {e.ErrorCode}");
             }
-
         }
 
+        /// <summary>
+        /// Modify BlobName based on given sector.
+        /// </summary>
+        /// <param name="sector">representing the current time frame</param>
+        /// <param name="fileName">the local file name representing the downloaded blob</param>
         private void ModifyTargetBlob(int sector, out string fileName)
         {
             if (sector <= 7 && sector >= 0)
