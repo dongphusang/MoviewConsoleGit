@@ -40,17 +40,11 @@ namespace MoviewConsole.Importer
         /// <param name="sector"> represents a specific time frame in a day. Ex: sector 0 = 0:00 to 2:59 in the morning</param>
         public async Task RetrieveFile(int sector)
         {
-            await DownloadBlob(sector);
-
-        }
-
-        private async Task DownloadBlob(int sector)
-        {
             BlobName = $"{sector}.txt";
             var fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
             try
             {
-                BlobClient = BlobContainerClient.GetBlobClient(BlobName); 
+                BlobClient = BlobContainerClient.GetBlobClient(BlobName);
                 if (await BlobClient.ExistsAsync())
                 {
                     Console.WriteLine("Blob Exists and Downloaded"); // debug
@@ -63,6 +57,7 @@ namespace MoviewConsole.Importer
                         Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob of previous sector retrieved"); // debug
 
                         ModifyTargetBlob(sector, out fileName);
+                        Console.WriteLine("ReportImporter.RetrieveFile().fileName(60): " + fileName);
                         await BlobClient.DownloadToAsync(fileName);
                     }
                     else
@@ -70,13 +65,16 @@ namespace MoviewConsole.Importer
                         Console.WriteLine("lmao your data isn't here yet bruh :)"); // debug
 
                         ModifyTargetBlob(sector, out fileName);
+                        Console.WriteLine("ReportImporter.RetrieveFile().fileName(68): " + fileName);
                         await BlobClient.DownloadToAsync(fileName);
-                    }                     
+                    }
                 }
-            } catch (RequestFailedException e)
+            }
+            catch (RequestFailedException e)
             {
                 Console.WriteLine($"HTTP request failed: {e.Message} {e.ErrorCode}");
             }
+
         }
 
         private void ModifyTargetBlob(int sector, out string fileName)

@@ -4,14 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MoviewConsole.Importer;
+using MoviewConsole.Decoder;
 
 namespace MoviewConsole.Manager
 {
     class ReportManager
     {
-        private readonly ReportImporter importer;
         public int Sector { get; private set; } // represents specific time frame in a day
         public string RawContent { get; private set; } // content extracted from blob
+
+        private List<string> processedImport;
+        private readonly ReportImporter importer;
+        private readonly ReportDecoder decoder;
         private DateTime date; // manipulated to get sector 
         private string fileName;
         private string filePath;
@@ -19,7 +23,9 @@ namespace MoviewConsole.Manager
 
         public ReportManager()
         {
-            importer = new ReportImporter();
+            importer = new();
+            decoder = new();
+            processedImport = new List<string>();
             fileName = "not specified";
             filePath = "not specified";
             RawContent = "non retrieved";
@@ -36,12 +42,18 @@ namespace MoviewConsole.Manager
             await importer.RetrieveFile(Sector); // temporary. this line's existence serves only for debugging
             Console.WriteLine(Sector);
             fileName = DetermineFileName();
+            Console.WriteLine(fileName);
             filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName); // path to %appdata%
 
             RawContent = File.ReadAllText(filePath);
-            Console.WriteLine("ReportManager.ExtractContent().RawContent: "+RawContent);
+            //Console.WriteLine("ReportManager.ExtractContent().RawContent: "+RawContent);
         }
 
+        /// <summary>
+        /// -Sub Method-
+        /// If there is the target blob downloaded to the folder, its name will not include the word null in it
+        /// </summary>
+        /// <returns>string indication of whether raw data retrieved or not retrieved</returns>
         private string DetermineFileName()
         {
             var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), $"{Sector}.txt");
@@ -54,6 +66,7 @@ namespace MoviewConsole.Manager
         }
 
         /// <summary>
+        /// -Sub Method-
         /// Determine the value of sector based the current Hour and Minute components of date
         /// </summary>
         private int DetermineSector()
@@ -91,6 +104,11 @@ namespace MoviewConsole.Manager
                 Console.WriteLine("ReportManager.DetermineSector().ifelse_structure.else: " + date.Hour + " " + date.Minute); // debug. inappropriate hours and minutes might get considered
                 return 7;
             }
+        }
+
+        public void RetrieveProcessedData()
+        {
+            decoder.ProcessImport(out processedImport);
         }
 
     }
