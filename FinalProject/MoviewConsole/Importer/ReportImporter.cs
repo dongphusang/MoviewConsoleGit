@@ -32,6 +32,9 @@ namespace MoviewConsole.Importer
         /// Goes back one sector if blob of that particular time frame isn't in the cloud. Goes back
         /// until there is an available blob in the cloud, however, retrieves a "{sector}null.txt" if there are none
         /// </summary>
+        /// <DEBUG>
+        /// fix block 54-59
+        /// </DEBUG>
         /// <param name="sector">represents a specific time frame in a day</param>
         public async Task RetrieveFile(int sector)
         {
@@ -47,12 +50,13 @@ namespace MoviewConsole.Importer
                 }
                 else
                 {
-                        while(!BlobClient.Exists())
-                        {
-                            Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob of previous sector retrieved"); // debug
-                            ModifyTargetBlob(sector, out fileName);
-                            Console.WriteLine("ReportImporter.RetrieveFile().fileName(60): " + fileName);
-                        }
+                    // this for most cases is fine. Although, if there are none targeted blob availble, the program will stuck in an infinite loop
+                    while(!BlobClient.Exists())
+                     {
+                        Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob of previous sector retrieved"); // debug
+                        ModifyTargetBlob(sector, out fileName);
+                        Console.WriteLine("ReportImporter.RetrieveFile().fileName(60): " + fileName);
+                    }
 
                        await BlobClient.DownloadToAsync(fileName);      
                 }
