@@ -9,7 +9,7 @@ namespace MoviewConsole.Manager
 {
     class ReportManager
     {
-        public int Sector { get; private set; } // represents a specific time frame in a day. Each time frame is 3 hours in length. Starting from 0:00 to 2:59 is sector 0 for example
+        private int sector; // represents a specific time frame in a day. Each time frame is 3 hours in length. Starting from 0:00 to 2:59 is sector 0 for example
         private string rawImport; // content extracted from blob
 
         private List<string> processedImport;
@@ -28,6 +28,14 @@ namespace MoviewConsole.Manager
             rawImport = "non retrieved";
         }
 
+        public void SyncCollectedData(List<string> data)
+        {
+            foreach (var item in processedImport)
+            {
+                data.Add(item);
+            }
+        }
+
         /// <summary>
         /// Gets the saved blob and extracts raw content
         /// </summary>
@@ -35,19 +43,19 @@ namespace MoviewConsole.Manager
         /// Can't separate line 51-55 from the method as processedImport might get incorrect/unexpected results. 
         /// This could potentially because of the block running ahead of time before file is retrieved in ReportImporter
         /// </DEBUGGING>
-        public async void ProcessData()
+        public async Task ProcessData()
         {
             date = DateTime.Now;
-            Sector = DetermineSector();
+            sector = DetermineSector();
 
-            await importer.RetrieveFile(Sector); // temporary. this line's existence serves only for debugging
-            Console.WriteLine(Sector); // debugging
+            await importer.RetrieveFile(sector); // temporary. this line's existence serves only for debugging
+            //Console.WriteLine(sector); // debugging
             fileName = importer.BlobName;
-            Console.WriteLine(fileName); // debugging
+            //Console.WriteLine(fileName); // debugging
             filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName); // path to %appdata%
 
             rawImport = File.ReadAllText(filePath);
-            Console.WriteLine("ReportManager.ExtractContent().RawContent: "+rawImport); // debugging
+            //Console.WriteLine("ReportManager.ExtractContent().RawContent: "+rawImport); // debugging
 
             var tokens = rawImport.Split(",");
             foreach (var token in tokens)

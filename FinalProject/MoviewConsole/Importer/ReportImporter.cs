@@ -48,8 +48,8 @@ namespace MoviewConsole.Importer
                 else
                 {
                     while(!blobClient.Exists())
-                     {
-                        Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob of previous sector retrieved"); // debug
+                    {
+                        //Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob of previous sector retrieved"); // debug
                         if (sector <= 7 && sector >= 0)
                         {
                             sector--;
