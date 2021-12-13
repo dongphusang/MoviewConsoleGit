@@ -12,17 +12,17 @@ namespace MoviewConsole.Importer
 {
     class ReportImporter : IImporter
     {
-        public BlobServiceClient BlobServiceClient { get; private set; }
-        public BlobContainerClient BlobContainerClient { get; private set; }
-        public BlobClient BlobClient { get; private set; }
+        private readonly BlobServiceClient blobServiceClient;
+        private readonly BlobContainerClient blobContainerClient;
+        private BlobClient blobClient;
         public string BlobName { get; private set; }
         public string ContainerName { get; private set; }
 
         public ReportImporter ()
         {
-            BlobServiceClient = new BlobServiceClient (IImporter.CONNECTION_STRING);
-            BlobContainerClient = BlobServiceClient.GetBlobContainerClient(IImporter.CONTAINER_NAME);
-            BlobClient = BlobContainerClient.GetBlobClient("Not Specified");
+            blobServiceClient = new BlobServiceClient (IImporter.CONNECTION_STRING);
+            blobContainerClient = blobServiceClient.GetBlobContainerClient(IImporter.CONTAINER_NAME);
+            blobClient = blobContainerClient.GetBlobClient("Not Specified");
             BlobName = "Not specified";
             ContainerName = "Not specified";
         }
@@ -32,9 +32,6 @@ namespace MoviewConsole.Importer
         /// Goes back one sector if blob of that particular time frame isn't in the cloud. Goes back
         /// until there is an available blob in the cloud, however, retrieves a "{sector}null.txt" if there are none
         /// </summary>
-        /// <DEBUG>
-        /// fix block 54-59
-        /// </DEBUG>
         /// <param name="sector">represents a specific time frame in a day</param>
         public async Task RetrieveFile(int sector)
         {
@@ -42,23 +39,33 @@ namespace MoviewConsole.Importer
             var fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
             try
             {
-                BlobClient = BlobContainerClient.GetBlobClient(BlobName);
-                if (await BlobClient.ExistsAsync())
+                blobClient = blobContainerClient.GetBlobClient(BlobName);
+                if (await blobClient.ExistsAsync())
                 {
-                    Console.WriteLine("Blob Exists and Downloaded"); // debug
-                    await BlobClient.DownloadToAsync(fileName);
+                    //Console.WriteLine("Blob Exists and Downloaded"); 
+                    await blobClient.DownloadToAsync(fileName);
                 }
                 else
                 {
-                    // this for most cases is fine. Although, if there are none targeted blob availble, the program will stuck in an infinite loop
-                    while(!BlobClient.Exists())
+                    while(!blobClient.Exists())
                      {
                         Console.WriteLine("Blob doesn't exist, decrease sector by 1, blob of previous sector retrieved"); // debug
-                        ModifyTargetBlob(sector, out fileName);
-                        Console.WriteLine("ReportImporter.RetrieveFile().fileName(60): " + fileName);
+                        if (sector <= 7 && sector >= 0)
+                        {
+                            sector--;
+                            BlobName = $"{sector}.txt";
+                            fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
+                            blobClient = blobContainerClient.GetBlobClient(BlobName);
+                        }
+                        else
+                        {
+                            BlobName = $"null.txt";
+                            fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
+                            blobClient = blobContainerClient.GetBlobClient(BlobName);
+                        }
+                        //Console.WriteLine("ReportImporter.RetrieveFile().fileName(60): " + fileName);
                     }
-
-                       await BlobClient.DownloadToAsync(fileName);      
+                       await blobClient.DownloadToAsync(fileName);      
                 }
             }
             catch (RequestFailedException e)
@@ -67,26 +74,6 @@ namespace MoviewConsole.Importer
             }
         }
 
-        /// <summary>
-        /// Modify BlobName based on given sector.
-        /// </summary>
-        /// <param name="sector">representing the current time frame</param>
-        /// <param name="fileName">the local file name representing the downloaded blob</param>
-        private void ModifyTargetBlob(int sector, out string fileName)
-        {
-            if (sector <= 7 && sector >= 0)
-            {
-                sector--;
-                BlobName = $"{sector}.txt";
-                fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
-                BlobClient = BlobContainerClient.GetBlobClient(BlobName);
-            }
-            else
-            {
-                BlobName = $"{sector}null.txt";
-                fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), BlobName);
-                BlobClient = BlobContainerClient.GetBlobClient(BlobName);
-            }
-        }
+        
     }
 }
