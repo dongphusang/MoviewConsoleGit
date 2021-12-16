@@ -15,7 +15,7 @@ namespace MoviewConsole
             {
                 Console.Clear();
                 report.ProcessData();
-                Thread.Sleep(18000000);
+                Thread.Sleep(10000);
             }                        
         }
     }

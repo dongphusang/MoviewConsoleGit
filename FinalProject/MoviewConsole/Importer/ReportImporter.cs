@@ -34,7 +34,7 @@ namespace MoviewConsole.Importer
         /// <summary>
         /// Retrieves blob from the cloud from given day sector.
         /// Goes back one sector if blob of that particular time frame isn't in the cloud. Goes back
-        /// until there is an available blob in the cloud, however, retrieves a "{sector}null.txt" if there are none
+        /// until there is an available blob in the cloud, however, retrieves a "null.txt" if there are none
         /// </summary>
         /// <param name="sector">represents a specific time frame in a day</param>
         public async Task RetrieveFile(int sector)
