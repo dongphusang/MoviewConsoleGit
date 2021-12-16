@@ -1,4 +1,10 @@
-﻿using System;
+﻿/*
+ * Regulates imported blobs and extracts contents from them
+ */ 
+
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,56 +23,66 @@ namespace MoviewConsole.Manager
         private DateTime date; // manipulated to get sector 
         private string fileName;
         private string filePath;
-        
+
+        private string height;
+        private string soilpH;
+        private string soilMoisture;
+        private string humidity;
+        private string temp;
+        private string co2Content;
+        private string luxContent;
+        private string nitrogen;
+        private string phosphorus;
+        private string potassium;
 
         public ReportManager()
         {
             importer = new();
-            processedImport = new List<string>();
+            processedImport = new();
             fileName = "not specified";
             filePath = "not specified";
             rawImport = "non retrieved";
-        }
-
-        public void SyncCollectedData(List<string> data)
-        {
-            foreach (var item in processedImport)
-            {
-                data.Add(item);
-            }
+            height = "null";
+            soilpH = "null";
+            soilMoisture = "null";
+            humidity = "null";
+            temp = "null";
+            co2Content = "null";
+            luxContent = "null";
+            nitrogen = "null";
+            phosphorus = "null";
+            potassium = "null";
         }
 
         /// <summary>
-        /// Gets the saved blob and extracts raw content
+        /// Extracts data from a downloaded blob
         /// </summary>
         /// <DEBUGGING NOTE>
         /// Can't separate line 51-55 from the method as processedImport might get incorrect/unexpected results. 
         /// This could potentially because of the block running ahead of time before file is retrieved in ReportImporter
         /// </DEBUGGING>
-        public async Task ProcessData()
+        public async void ProcessData()
         {
             date = DateTime.Now;
             sector = DetermineSector();
 
-            await importer.RetrieveFile(sector); // temporary. this line's existence serves only for debugging
-            //Console.WriteLine(sector); // debugging
-            fileName = importer.BlobName;
-            //Console.WriteLine(fileName); // debugging
-            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName); // path to %appdata%
+            await importer.RetrieveFile(sector); 
 
+            fileName = importer.BlobName;
+            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName); // path to %appdata%
             rawImport = File.ReadAllText(filePath);
-            //Console.WriteLine("ReportManager.ExtractContent().RawContent: "+rawImport); // debugging
 
             var tokens = rawImport.Split(",");
             foreach (var token in tokens)
             {
-                Console.WriteLine("ReportManager.ProcessImport(): " + token); // debugging
                 processedImport.Add(token);
             }
+
+            InitializeAttributes();
+            OutputData();
         }
 
         /// <summary>
-        /// -Sub Method-
         /// Determine the value of sector based the current Hour and Minute components of date
         /// </summary>
         private int DetermineSector()
@@ -101,11 +117,58 @@ namespace MoviewConsole.Manager
             }
             else
             {
-                Console.WriteLine("ReportManager.DetermineSector().ifelse_structure.else: " + date.Hour + " " + date.Minute); // debug. inappropriate hours and minutes might get considered
                 return 7;
             }
         }
 
+        /// <summary>
+        /// Initialize attributes of a plant
+        /// </summary>
+        private void InitializeAttributes()
+        {
+            height = processedImport[0];
+            soilpH = processedImport[1];
+            soilMoisture = processedImport[2];
+            humidity = processedImport[3];
+            temp = processedImport[4];
+            co2Content = processedImport[5];
+            luxContent = processedImport[6];
+            nitrogen = processedImport[7];
+            phosphorus = processedImport[8];
+            potassium = processedImport[9];
+        }
+
+        /// <summary>
+        /// Output data
+        /// </summary>
+        private void OutputData()
+        {
+            Console.WriteLine("---Target Plant: Tomato---");
+            Console.WriteLine("Target Specialized: Grape Tomato");
+
+            Console.WriteLine("\n");
+            Console.WriteLine("Size Attribute(s)\tSoil Attribute(s)\tSurroundings");
+            Console.WriteLine("\n");
+
+            Console.Write($"Height: {height} cm\t\t");
+            Console.Write($"SoilMoisture: {soilMoisture}%\t");
+            Console.WriteLine($"Humidity: {humidity}%");
+
+            Console.Write("\t\t\t");
+            Console.Write($"SoilpH: {soilpH}pH\t\t");
+            Console.WriteLine($"Temperature: {temp}C");
+
+            Console.Write("\t\t\t");
+            Console.Write($"Nitrogen: {nitrogen} mg/kg\t");
+            Console.WriteLine($"CO2: {co2Content} ppm");
+
+            Console.Write("\t\t\t");
+            Console.Write($"Phosphorus: {phosphorus} mg/kg\t");
+            Console.WriteLine($"Lux: {luxContent} lux");
+
+            Console.Write("\t\t\t");
+            Console.WriteLine($"Potassium: {potassium} mg/kg");
+        }
 
     }
 }
